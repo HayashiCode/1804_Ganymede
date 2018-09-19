@@ -1,30 +1,31 @@
 /*********************************************************************************/
-/* STM32F407ZET6‚ÌŠg’£ƒoƒX‚ÌŽü•ÓIO‚Ì‰Šú‰»                                       */
+/* STM32F407ZET6ã®æ‹¡å¼µãƒã‚¹ã®å‘¨è¾ºIOã®åˆæœŸåŒ–                                       */
 /*                                         designed by hamayan since 2018/09/13  */
 /*********************************************************************************/
 #include  "stm32f4xx.h"
 #include  "delivertive.h"
 #include  "peripheral.h"
+#include  "stm32f4xx_gpio.h"
 
 /*************************************************************************/
-/* ‚»‚Ì‘¼‚Ì’è‹`                                                          */
-/*************************************************************************/
-
-/*************************************************************************/
-/* ‘åˆæ•Ï”éŒ¾                                                          */
+/* ãã®ä»–ã®å®šç¾©                                                          */
 /*************************************************************************/
 
 /*************************************************************************/
-/* ƒvƒƒgƒ^ƒCƒvéŒ¾                                                      */
+/* å¤§åŸŸå¤‰æ•°å®£è¨€                                                          */
+/*************************************************************************/
+
+/*************************************************************************/
+/* ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€                                                      */
 /*************************************************************************/
 static void gpioPortSetting( void );
 
 /*************************************************************************/
-/* ’[Žq’è‹`                                                              */
+/* ç«¯å­å®šç¾©                                                              */
 /*************************************************************************/
 
 /*************************************************************************/
-/* ƒ|[ƒg‚ÌÝ’è                                                          */
+/* ãƒãƒ¼ãƒˆã®è¨­å®š                                                          */
 /*************************************************************************/
 static void gpioPortSetting( void )
 {
@@ -135,7 +136,7 @@ static void gpioPortSetting( void )
 }
 
 /*************************************************************************/
-/* ƒvƒƒZƒbƒTŠO•”ƒoƒX‚ð—LŒø‚É‚·‚é                                        */
+/* ãƒ—ãƒ­ã‚»ãƒƒã‚µå¤–éƒ¨ãƒã‚¹ã‚’æœ‰åŠ¹ã«ã™ã‚‹                                        */
 /*************************************************************************/
 void ExtBusInit( void )
 {
@@ -144,121 +145,121 @@ void ExtBusInit( void )
   RCC_AHB3PeriphResetCmd( RCC_AHB3Periph_FSMC, DISABLE );
   RCC_AHB3PeriphClockCmd( RCC_AHB3Periph_FSMC, ENABLE );
 
-  /*dpram bank1‚Ìsram—Ìˆæ‚ð—LŒø‰»*/
+  /*dpram bank1ã®sramé ˜åŸŸã‚’æœ‰åŠ¹åŒ–*/
   volatile unsigned long *bcr1 = (volatile unsigned long *)FSMC_Bank1_R_BASE;
   volatile unsigned long *btr1 = (volatile unsigned long *)(FSMC_Bank1_R_BASE + 4);
   volatile unsigned long *bwtr1 = (volatile unsigned long *)(FSMC_Bank1E_R_BASE);
 
-  /*NE1 SRAMÝ’è 0x60000000*/
+  /*NE1 SRAMè¨­å®š 0x60000000*/
   *bcr1 = 0x000030db;
   *bcr1 &= ~(FSMC_BCR1_ASYNCWAIT | FSMC_BCR1_WAITEN | FSMC_BCR1_MTYP | FSMC_BCR1_MUXEN | FSMC_BCR1_EXTMOD | FSMC_BCR1_MWID | FSMC_BCR1_MBKEN);
   *bcr1 |= (FSMC_BCR1_EXTMOD | FSMC_BCR1_MWID_0 | FSMC_BCR1_MBKEN);
 
-  /*“Ç‚Ýž‚Ý‘¤Ý’è*/
-  /*idt70v24s55‚Ìread‚ÌƒTƒCƒNƒ‹ƒ^ƒCƒ€‚Í55ns*/
+  /*èª­ã¿è¾¼ã¿å´è¨­å®š*/
+  /*idt70v24s55ã®readã®ã‚µã‚¤ã‚¯ãƒ«ã‚¿ã‚¤ãƒ ã¯55ns*/
   *btr1 = 0x0fffffff;
   *btr1 &= ~(FSMC_BTR1_ACCMOD | FSMC_BTR1_DATAST | FSMC_BTR1_ADDHLD | FSMC_BTR1_ADDSET | FSMC_BTR1_BUSTURN );
-  /*ƒAƒhƒŒƒX—LŒø‚©‚çƒf[ƒ^—LŒø‚Ü‚Å35ns*/
-  /*cs—LŒø‚©‚çƒf[ƒ^—LŒø‚Ü‚Å35ns*/
-  /*bhe,ble—LŒø‚©‚çƒf[ƒ^—LŒø‚Ü‚Å15ns*/
+  /*ã‚¢ãƒ‰ãƒ¬ã‚¹æœ‰åŠ¹ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿æœ‰åŠ¹ã¾ã§35ns*/
+  /*csæœ‰åŠ¹ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿æœ‰åŠ¹ã¾ã§35ns*/
+  /*bhe,bleæœ‰åŠ¹ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿æœ‰åŠ¹ã¾ã§15ns*/
   *btr1 |= FSMC_BTR1_ADDSET_2 | FSMC_BTR1_ADDSET_1;  //  chip select pulse width = 90ns
-  /*rd—LŒø‚©‚çƒf[ƒ^—LŒø‚Ü‚Å15ns*/
+  /*rdæœ‰åŠ¹ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿æœ‰åŠ¹ã¾ã§15ns*/
   *btr1 |= FSMC_BTR1_DATAST_3 | FSMC_BTR1_DATAST_0;  // read pulse width = 54ns
-  /*cs–³Œø‚©‚çƒf[ƒ^–³Œø‚Ü‚Å15ns*/
-  /*rd–³Œø‚©‚çƒf[ƒ^–³Œø‚Ü‚Å10ns*/
-  /*bhe,ble–³Œø‚©‚çƒf[ƒ^–³Œø‚Ü‚Å10ns*/
-  /*ŽžŠÔ’²®*/
+  /*csç„¡åŠ¹ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ç„¡åŠ¹ã¾ã§15ns*/
+  /*rdç„¡åŠ¹ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ç„¡åŠ¹ã¾ã§10ns*/
+  /*bhe,bleç„¡åŠ¹ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ç„¡åŠ¹ã¾ã§10ns*/
+  /*æ™‚é–“èª¿æ•´*/
   *btr1 |= FSMC_BTR1_BUSTURN_1;  //18ns
 
-  /*‘‚«ž‚Ý‘¤Ý’è*/
-  /*idt70v24s55‚Ìwrite‚ÌƒTƒCƒNƒ‹ƒ^ƒCƒ€‚Ímin:55ns -> 112ns */
+  /*æ›¸ãè¾¼ã¿å´è¨­å®š*/
+  /*idt70v24s55ã®writeã®ã‚µã‚¤ã‚¯ãƒ«ã‚¿ã‚¤ãƒ ã¯min:55ns -> 112ns */
   *bwtr1 = 0x0fffffff;
   *bwtr1 &= ~(FSMC_BWTR1_ACCMOD | FSMC_BWTR1_DATAST | FSMC_BWTR1_ADDSET | FSMC_BTR1_BUSTURN );
-  /*ƒAƒhƒŒƒXƒZƒbƒgƒAƒbƒv0ns*/
-  /*cs•95ns*/
+  /*ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—0ns*/
+  /*cså¹…95ns*/
   *bwtr1 |= FSMC_BWTR1_ADDSET_2 | FSMC_BWTR1_ADDSET_1;
-  /*wr• min:40ns -> 55ns*/
-  /*ƒf[ƒ^ƒZƒbƒgƒAƒbƒv min:30ns*/
+  /*wrå¹… min:40ns -> 55ns*/
+  /*ãƒ‡ãƒ¼ã‚¿ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ— min:30ns*/
   *bwtr1 |= FSMC_BWTR1_DATAST_3 | FSMC_BWTR1_DATAST_0;
-  /*ŽžŠÔ’²®*/
+  /*æ™‚é–“èª¿æ•´*/
   *bwtr1 |= FSMC_BTR1_BUSTURN_1;  //12ns -> 18ns
 
 
-  /*adc1 bank1‚Ìsram—Ìˆæ‚ð—LŒø‰»*/
+  /*adc1 bank1ã®sramé ˜åŸŸã‚’æœ‰åŠ¹åŒ–*/
   volatile unsigned long *bcr2 = (volatile unsigned long *)(FSMC_Bank1_R_BASE + (8 * 1));
   volatile unsigned long *btr2 = (volatile unsigned long *)(FSMC_Bank1_R_BASE + 4 + (8 * 1));
   volatile unsigned long *bwtr2 = (volatile unsigned long *)(FSMC_Bank1E_R_BASE + (8 * 1));
 
-  /*NE2 SRAMÝ’è 0x64000000*/
+  /*NE2 SRAMè¨­å®š 0x64000000*/
   *bcr2 = 0x000030db;
   *bcr2 &= ~(FSMC_BCR2_ASYNCWAIT | FSMC_BCR2_WAITEN | FSMC_BCR2_MTYP | FSMC_BCR2_MUXEN | FSMC_BCR2_EXTMOD | FSMC_BCR2_MWID | FSMC_BCR2_MBKEN);
   *bcr2 |= (FSMC_BCR2_EXTMOD | FSMC_BCR2_MWID_0 | FSMC_BCR2_MBKEN);
 
-  /*“Ç‚Ýž‚Ý‘¤Ý’è*/
-  /*max1316ecm‚Ìread‚ÌƒTƒCƒNƒ‹ƒ^ƒCƒ€‚Ímin:60ns -> 100ns??*/
+  /*èª­ã¿è¾¼ã¿å´è¨­å®š*/
+  /*max1316ecmã®readã®ã‚µã‚¤ã‚¯ãƒ«ã‚¿ã‚¤ãƒ ã¯min:60ns -> 100ns??*/
   *btr2 = 0x0fffffff;
   *btr2 &= ~(FSMC_BTR2_ACCMOD | FSMC_BTR2_DATAST | FSMC_BTR2_ADDHLD | FSMC_BTR2_ADDSET | FSMC_BTR2_BUSTURN );
-  /*cs‚Ì•‚Ímin:30ns -> 77ns*/
-  /*rd‚Ì•‚Ímin:30ns -> 72ns*/
-  /*rd‚©‚ç‚Ìƒf[ƒ^ƒZƒbƒgƒAƒbƒv‚Ímax:30ns*/
-  /*rd‚©‚ç‚Ìƒf[ƒ^ƒz[ƒ‹ƒh‚Ímax:30ns*/
+  /*csã®å¹…ã¯min:30ns -> 77ns*/
+  /*rdã®å¹…ã¯min:30ns -> 72ns*/
+  /*rdã‹ã‚‰ã®ãƒ‡ãƒ¼ã‚¿ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ã¯max:30ns*/
+  /*rdã‹ã‚‰ã®ãƒ‡ãƒ¼ã‚¿ãƒ›ãƒ¼ãƒ«ãƒ‰ã¯max:30ns*/
   *btr2 |= FSMC_BTR2_DATAST_3 | FSMC_BTR2_DATAST_2; //72ns
-  /*ƒAƒhƒŒƒXƒZƒbƒgƒAƒbƒv‚ÍŽ–ŽÀã‹K’è–³‚µ*/
+  /*ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ã¯äº‹å®Ÿä¸Šè¦å®šç„¡ã—*/
   *btr2 |= FSMC_BTR2_ADDSET_0;
-  /*ŽžŠÔ’²®*/
+  /*æ™‚é–“èª¿æ•´*/
   *btr2 |= FSMC_BTR2_BUSTURN_2;  //??ns
 
-  /*‘‚«ž‚Ý‘¤Ý’è*/
-  /*max1316ecm‚Ìwrite‚ÌƒTƒCƒNƒ‹ƒ^ƒCƒ€‚Í??ns*/
+  /*æ›¸ãè¾¼ã¿å´è¨­å®š*/
+  /*max1316ecmã®writeã®ã‚µã‚¤ã‚¯ãƒ«ã‚¿ã‚¤ãƒ ã¯??ns*/
   *bwtr2 = 0x0fffffff;
   *bwtr2 &= ~(FSMC_BWTR2_ACCMOD | FSMC_BWTR2_DATAST | FSMC_BWTR2_ADDSET | FSMC_BTR2_BUSTURN );
-  /*cs‚Ì•‚Í min:30ns -> 71ns*/
-  /*wr‚Ì•‚Í min:30ns -> 60ns*/
-  /*wr‚©‚ç‚Ìƒf[ƒ^ƒZƒbƒgƒAƒbƒv‚Í min:10ns*/
-  /*wr‚©‚ç‚Ìƒf[ƒ^ƒz[ƒ‹ƒh‚Í min:10ns*/
+  /*csã®å¹…ã¯ min:30ns -> 71ns*/
+  /*wrã®å¹…ã¯ min:30ns -> 60ns*/
+  /*wrã‹ã‚‰ã®ãƒ‡ãƒ¼ã‚¿ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ã¯ min:10ns*/
+  /*wrã‹ã‚‰ã®ãƒ‡ãƒ¼ã‚¿ãƒ›ãƒ¼ãƒ«ãƒ‰ã¯ min:10ns*/
   *bwtr2 |= FSMC_BWTR2_DATAST_3 | FSMC_BWTR2_DATAST_1;  //54ns
-  /*ƒAƒhƒŒƒXƒZƒbƒgƒAƒbƒv‚ÍŽ–ŽÀã‹K’è–³‚µ*/
+  /*ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ã¯äº‹å®Ÿä¸Šè¦å®šç„¡ã—*/
   *bwtr2 |= FSMC_BWTR2_ADDSET_0;
-  /*ŽžŠÔ’²®*/
+  /*æ™‚é–“èª¿æ•´*/
   *bwtr2 |= FSMC_BTR2_BUSTURN_2;  //??ns
 
 
-  /*adc2 bank2‚Ìsram—Ìˆæ‚ð—LŒø‰»*/
+  /*adc2 bank2ã®sramé ˜åŸŸã‚’æœ‰åŠ¹åŒ–*/
   volatile unsigned long *bcr3 = (volatile unsigned long *)(FSMC_Bank1_R_BASE + (8 * 2));
   volatile unsigned long *btr3 = (volatile unsigned long *)(FSMC_Bank1_R_BASE + 4 + (8 * 2));
   volatile unsigned long *bwtr3 = (volatile unsigned long *)(FSMC_Bank1E_R_BASE + (8 * 2));
 
-  /*NE3 SRAMÝ’è 0x68000000*/
+  /*NE3 SRAMè¨­å®š 0x68000000*/
   *bcr3 = 0x000030db;
   *bcr3 &= ~(FSMC_BCR3_ASYNCWAIT | FSMC_BCR3_WAITEN | FSMC_BCR3_MTYP | FSMC_BCR3_MUXEN | FSMC_BCR3_EXTMOD | FSMC_BCR3_MWID | FSMC_BCR3_MBKEN);
   *bcr3 |= (FSMC_BCR3_EXTMOD | FSMC_BCR3_MWID_0 | FSMC_BCR3_MBKEN);
 
-  /*“Ç‚Ýž‚Ý‘¤Ý’è*/
-  /*max1316ecm‚Ìread‚ÌƒTƒCƒNƒ‹ƒ^ƒCƒ€‚Ímin:60ns -> 137ns??*/
+  /*èª­ã¿è¾¼ã¿å´è¨­å®š*/
+  /*max1316ecmã®readã®ã‚µã‚¤ã‚¯ãƒ«ã‚¿ã‚¤ãƒ ã¯min:60ns -> 137ns??*/
   *btr3 = 0x0fffffff;
   *btr3 &= ~(FSMC_BTR3_ACCMOD | FSMC_BTR3_DATAST | FSMC_BTR3_ADDHLD | FSMC_BTR3_ADDSET | FSMC_BTR3_BUSTURN );
-  /*cs‚Ì•‚Ímin:30ns -> 77ns*/
-  /*rd‚Ì•‚Ímin:30ns -> 72ns*/
-  /*rd‚©‚ç‚Ìƒf[ƒ^ƒZƒbƒgƒAƒbƒv‚Ímax:30ns*/
-  /*rd‚©‚ç‚Ìƒf[ƒ^ƒz[ƒ‹ƒh‚Ímax:30ns*/
+  /*csã®å¹…ã¯min:30ns -> 77ns*/
+  /*rdã®å¹…ã¯min:30ns -> 72ns*/
+  /*rdã‹ã‚‰ã®ãƒ‡ãƒ¼ã‚¿ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ã¯max:30ns*/
+  /*rdã‹ã‚‰ã®ãƒ‡ãƒ¼ã‚¿ãƒ›ãƒ¼ãƒ«ãƒ‰ã¯max:30ns*/
   *btr3 |= FSMC_BTR3_DATAST_3 | FSMC_BTR3_DATAST_2; //72ns
-  /*ƒAƒhƒŒƒXƒZƒbƒgƒAƒbƒv‚ÍŽ–ŽÀã‹K’è–³‚µ*/
+  /*ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ã¯äº‹å®Ÿä¸Šè¦å®šç„¡ã—*/
   *btr3 |= FSMC_BTR3_ADDSET_0;
-  /*ŽžŠÔ’²®*/
+  /*æ™‚é–“èª¿æ•´*/
   *btr3 |= FSMC_BTR3_BUSTURN_2;  //??ns
 
-  /*‘‚«ž‚Ý‘¤Ý’è*/
-  /*max1316ecm‚Ìwrite‚ÌƒTƒCƒNƒ‹ƒ^ƒCƒ€‚Í100ns*/
+  /*æ›¸ãè¾¼ã¿å´è¨­å®š*/
+  /*max1316ecmã®writeã®ã‚µã‚¤ã‚¯ãƒ«ã‚¿ã‚¤ãƒ ã¯100ns*/
   *bwtr3 = 0x0fffffff;
   *bwtr3 &= ~(FSMC_BWTR3_ACCMOD | FSMC_BWTR3_DATAST | FSMC_BWTR3_ADDSET | FSMC_BTR3_BUSTURN );
-  /*cs‚Ì•‚Í min:30ns -> 71ns*/
-  /*wr‚Ì•‚Í min:30ns -> 60ns*/
-  /*wr‚©‚ç‚Ìƒf[ƒ^ƒZƒbƒgƒAƒbƒv‚Í min:10ns*/
-  /*wr‚©‚ç‚Ìƒf[ƒ^ƒz[ƒ‹ƒh‚Í min:10ns*/
+  /*csã®å¹…ã¯ min:30ns -> 71ns*/
+  /*wrã®å¹…ã¯ min:30ns -> 60ns*/
+  /*wrã‹ã‚‰ã®ãƒ‡ãƒ¼ã‚¿ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ã¯ min:10ns*/
+  /*wrã‹ã‚‰ã®ãƒ‡ãƒ¼ã‚¿ãƒ›ãƒ¼ãƒ«ãƒ‰ã¯ min:10ns*/
   *bwtr3 |= FSMC_BWTR3_DATAST_3 | FSMC_BWTR3_DATAST_1;  //54ns
-  /*ƒAƒhƒŒƒXƒZƒbƒgƒAƒbƒv‚ÍŽ–ŽÀã‹K’è–³‚µ*/
+  /*ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ã¯äº‹å®Ÿä¸Šè¦å®šç„¡ã—*/
   *bwtr3 |= FSMC_BWTR3_ADDSET_0;
-  /*ŽžŠÔ’²®*/
+  /*æ™‚é–“èª¿æ•´*/
   *bwtr3 |= FSMC_BTR3_BUSTURN_2;  //??ns
 }
 
